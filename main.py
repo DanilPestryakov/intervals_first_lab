@@ -29,7 +29,31 @@ def draw_plot(data_list, need_save=True):
     plt.show()
 
 
+def get_out_coeff(data_list):
+    out_coeff_l = []
+    for i in range(len(data_list[0])):
+        out_coeff_l.append(data_list[0][i] / data_list[1][i])
+    return out_coeff_l
+
+
+def draw_intervals(data_list, need_save=True):
+    x = np.arange(0, len(data_list[0]), 1, dtype=int)
+    for num, data_l in enumerate(data_list, start=1):
+        plt.errorbar(x, data_l, yerr=10**(-4), marker='o', linestyle='none', ecolor='k', elinewidth=0.8, capsize=4,
+                     capthick=1)
+        plt.xlabel("n")
+        plt.ylabel("mV")
+        plt.title(f'Ch_{num} with intervals')
+        if need_save:
+            plt.savefig(f'./pictures/error_ch_{num}.png')
+        plt.show()
+
+
 if __name__ == "__main__":
     data = read_data()
-    draw_plot(data)
+    draw_plot(data, False)
+    out_coeff = get_out_coeff(data)
+    print(f'R21 = [{min(out_coeff)}, {max(out_coeff)}]')
+    draw_intervals(data, False)
+
 
