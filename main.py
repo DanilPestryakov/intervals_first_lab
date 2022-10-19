@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import genfromtxt
+from sklearn.linear_model import LinearRegression
 
 
 def read_data():
@@ -49,11 +50,33 @@ def draw_intervals(data_list, need_save=True):
         plt.show()
 
 
+def get_linear_regression(data_list, need_save=True):
+    x = np.arange(0, len(data_list[0]), 1, dtype=int)
+    x_r = np.array(x).reshape((-1, 1))
+    lsm_params = []
+    for num, data_l in enumerate(data_list, start=1):
+        model = LinearRegression().fit(x_r, np.array(data_l))
+        k = model.coef_
+        b = model.intercept_
+        plt.errorbar(x, data_l, yerr=10 ** (-4), marker='o', linestyle='none', ecolor='k', elinewidth=0.8, capsize=4,
+                     capthick=1, label=f'intervals_ch_{num}')
+        plt.plot(x, k * x + b, label=f'regression_ch_{num}')
+        plt.xlabel("n")
+        plt.ylabel("mV")
+        plt.title(f'Ch_{num} with intervals')
+        if need_save:
+            plt.savefig(f'./pictures/linear_regression_ch_{num}.png')
+        plt.legend(frameon=False)
+        plt.show()
+        lsm_params.append((k, b))
+    return lsm_params
+
+
 if __name__ == "__main__":
     data = read_data()
-    draw_plot(data, False)
+    #draw_plot(data, True)
     out_coeff = get_out_coeff(data)
     print(f'R21 = [{min(out_coeff)}, {max(out_coeff)}]')
-    draw_intervals(data, False)
-
+    #draw_intervals(data, True)
+    lsm_p = get_linear_regression(data, False)
 
