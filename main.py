@@ -127,12 +127,47 @@ def get_linear(data_list, w_list, lsm_p_list, need_save=True):
     return linear_data
 
 
+def multi_jaccard_metric(interval_list):
+    res_inter = interval_list[0]
+    res_union = interval_list[0]
+    for i in range(1, len(interval_list), 1):
+        res_inter = [max(res_inter[0], interval_list[i][0]), min(res_inter[1], interval_list[i][1])]
+        res_union = [min(res_union[0], interval_list[i][0]), max(res_union[1], interval_list[i][1])]
+    return (res_inter[1] - res_inter[0]) / (res_union[1] - res_union[0])
+
+
+def get_inner_r(data_list, w_list, R_out, need_save=True):
+    step_count = 1000
+    eps = 10**(-4)
+    r_step = (R_out[1] - R_out[0]) / step_count
+    start = R_out[0]
+    jaccar_list = []
+    while start <= R_out[1]:
+        data_l = [[data_item - eps * w_list[0][num], data_item + eps * w_list[0][num]] for num, data_item in enumerate(list(data_list[0]))]
+        data_l += [[start * (data_item - eps * w_list[1][num]), start * (data_item + eps * w_list[1][num])] for num, data_item in enumerate(list(data_list[1]))]
+        jaccar_list.append((start, multi_jaccard_metric(data_l)))
+        start += r_step
+    plt.plot([R[0] for R in jaccar_list], [R[1] for R in jaccar_list], label='Jaccard metric by R')
+    optimal = [(R[0], R[1]) for R in jaccar_list if R[1] >= 0]
+    plt.plot(optimal[0][0], optimal[0][1], 'ro', label=f'minR={optimal[0][0]}')
+    plt.plot(optimal[-1][0], optimal[-1][1], 'ro', label=f'maxR={optimal[-1][0]}')
+    plt.xlabel("R")
+    plt.ylabel("JK")
+    plt.legend(frameon=False)
+    plt.title(f'Jaccard metric')
+    if need_save:
+        plt.savefig(f'./pictures/Jaccard_metric.png')
+    plt.show()
+
+
 if __name__ == "__main__":
     data = read_data()
     draw_plot(data, True)
     out_coeff = get_out_coeff(data)
+    R_outer = [min(out_coeff), max(out_coeff)]
     print(f'R21 = [{min(out_coeff)}, {max(out_coeff)}]')
     draw_intervals(data, True)
     lsm_p = get_linear_regression(data, True)
     w_l = get_w_histogram(data, lsm_p, True)
     lin_data = get_linear(data, w_l, lsm_p, need_save=True)
+    get_inner_r(lin_data, w_l, R_outer)
