@@ -150,22 +150,45 @@ def get_inner_r(data_list, w_list, R_out, need_save=True, save_path=''):
     plt.plot([R[0] for R in jaccar_list], [R[1] for R in jaccar_list], label='Jaccard metric by R')
     optimal = [(R[0], R[1]) for R in jaccar_list if R[1] >= 0]
     have_optimal = False
+    optimal_m = None
     if optimal:
         plt.plot(optimal[0][0], optimal[0][1], 'ro', label=f'minR={optimal[0][0]:.5f}')
         plt.plot(optimal[-1][0], optimal[-1][1], 'ro', label=f'maxR={optimal[-1][0]:.5f}')
         argmaxR = max(optimal, key=lambda opt: opt[1])
         plt.plot(argmaxR[0], argmaxR[1], 'go', label=f'optR=({argmaxR[0]:.5f}, {argmaxR[1]:.5f})')
         have_optimal = True
+        optimal_m = max(optimal, key=lambda opt: opt[1])
         print('optimal: ', max(optimal, key=lambda opt: opt[1]))
     plt.xlabel("R")
     plt.ylabel("JK")
     plt.legend(frameon=False)
     plt.title(f'Jaccard metric')
-    print()
     if need_save:
         plt.savefig(f'{save_path}/Jaccard_metric.png')
     plt.show()
-    return have_optimal
+    return optimal_m
+
+
+def draw_all_intervals(data_list, w_list, optimal_m, need_save=True, save_path=''):
+    data_len = (len(data_list[0]))
+    x = np.arange(1, data_len + 1, 1, dtype=int)
+    eps = 10**(-4)
+    yerr = [eps] * data_len
+    for i in range(data_len):
+        yerr[i] *= w_list[0][i]
+    plt.errorbar(x, data_list[0], yerr=yerr, ecolor='cyan', label='intervals_ch_1')
+    yerr = [eps] * data_len
+    for i in range(data_len):
+        yerr[i] *= (w_list[1][i] * optimal_m)
+        data_list[1][i] *= optimal_m
+    plt.errorbar(x, data_list[1], yerr=yerr, ecolor='red', label='intervals_ch_2')
+    plt.legend(frameon=False)
+    plt.title(f'Intervals intersection')
+    plt.xlabel("n")
+    plt.ylabel("mV")
+    if need_save:
+        plt.savefig(f'{save_path}/weighted_intervals.png')
+    plt.show()
 
 
 def main(data_postfix_):
@@ -182,7 +205,9 @@ def main(data_postfix_):
     print(lsm_p)
     w_l = get_w_histogram(data, lsm_p, True, save_path=save_p)
     lin_data = get_linear(data, w_l, lsm_p, need_save=True, save_path=save_p)
-    have_opt = get_inner_r(lin_data, w_l, R_outer, True, save_path=save_p)
+    opt_m = get_inner_r(lin_data, w_l, R_outer, True, save_path=save_p)
+    if opt_m is not None:
+        draw_all_intervals(lin_data, w_l, opt_m[0], True, save_path=save_p)
 
 
 if __name__ == "__main__":
