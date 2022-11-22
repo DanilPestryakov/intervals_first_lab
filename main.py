@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import mat4py as m4p
 from numpy import genfromtxt
 from sklearn.linear_model import LinearRegression
 
@@ -149,14 +150,12 @@ def get_inner_r(data_list, w_list, R_out, need_save=True, save_path=''):
         start += r_step
     plt.plot([R[0] for R in jaccar_list], [R[1] for R in jaccar_list], label='Jaccard metric by R')
     optimal = [(R[0], R[1]) for R in jaccar_list if R[1] >= 0]
-    have_optimal = False
     optimal_m = None
     if optimal:
         plt.plot(optimal[0][0], optimal[0][1], 'ro', label=f'minR={optimal[0][0]:.5f}')
         plt.plot(optimal[-1][0], optimal[-1][1], 'ro', label=f'maxR={optimal[-1][0]:.5f}')
         argmaxR = max(optimal, key=lambda opt: opt[1])
         plt.plot(argmaxR[0], argmaxR[1], 'go', label=f'optR=({argmaxR[0]:.5f}, {argmaxR[1]:.5f})')
-        have_optimal = True
         optimal_m = max(optimal, key=lambda opt: opt[1])
         print('optimal: ', max(optimal, key=lambda opt: opt[1]))
     plt.xlabel("R")
@@ -192,7 +191,7 @@ def draw_all_intervals(data_list, w_list, optimal_m, need_save=True, save_path='
 
 
 def main(data_postfix_):
-    data = read_data([f'./data/ch_1/Канал 1_{data_postfix_}', f'./data/ch_2/Канал 2_{data_postfix}'])
+    data = read_data([f'./data/ch_1/Канал 1_{data_postfix_}', f'./data/ch_2/Канал 2_{data_postfix_}'])
     save_p = f'./pictures/{data_postfix_}'
     if not os.path.exists(save_p):
         os.makedirs(save_p)
@@ -222,4 +221,11 @@ if __name__ == "__main__":
     #         continue
     #     print('_____________________________________________')
     # print(have_opt_list)
-    main(data_postfix)
+    #main(data_postfix)
+    data = read_data([f'./data/ch_1/Канал 1_{data_postfix}', f'./data/ch_2/Канал 2_{data_postfix}'])
+    x = np.arange(1, 201, 1, dtype=int).tolist()
+    for num, data_l in enumerate(data):
+        with open(f'data_{num}.mat', 'w') as file:
+            for num_, y_ in enumerate(data_l):
+                print(f'{x[num_]} {y_}')
+                file.write(f'{x[num_]} {y_}\n')
