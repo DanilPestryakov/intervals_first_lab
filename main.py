@@ -41,7 +41,7 @@ def get_out_coeff(data_list):
 def draw_intervals(data_list, need_save=True, save_path=''):
     x = np.arange(1, len(data_list[0]) + 1, 1, dtype=int)
     for num, data_l in enumerate(data_list, start=1):
-        plt.errorbar(x, data_l, yerr=10**(-4), marker='o', linestyle='none', ecolor='k', elinewidth=0.8, capsize=4,
+        plt.errorbar(x, data_l, yerr=10 ** (-4), marker='o', linestyle='none', ecolor='k', elinewidth=0.8, capsize=4,
                      capthick=1)
         plt.xlabel("n")
         plt.ylabel("mV")
@@ -74,7 +74,7 @@ def get_linear_regression(data_list, need_save=True, save_path=''):
 
 
 def get_w_histogram(data_list, lsm_p_list, need_save=True, save_path=''):
-    eps = 10**(-4)
+    eps = 10 ** (-4)
     w_list_arr = []
     for num, data_l in enumerate(data_list, start=1):
         w_list = []
@@ -105,7 +105,7 @@ def get_w_histogram(data_list, lsm_p_list, need_save=True, save_path=''):
 def get_linear(data_list, w_list, lsm_p_list, need_save=True, save_path=''):
     data_len = len(data_list[0])
     x = np.arange(1, data_len + 1, 1, dtype=int)
-    eps = 10**(-4)
+    eps = 10 ** (-4)
     yerr = [eps] * data_len
     linear_data = []
     for num, data_l in enumerate(data_list, start=0):
@@ -139,13 +139,15 @@ def multi_jaccard_metric(interval_list):
 
 def get_inner_r(data_list, w_list, R_out, need_save=True, save_path=''):
     step_count = 1000
-    eps = 10**(-4)
+    eps = 10 ** (-4)
     r_step = (R_out[1] - R_out[0]) / step_count
     start = R_out[0]
     jaccar_list = []
     while start <= R_out[1]:
-        data_l = [[data_item - eps * w_list[0][num], data_item + eps * w_list[0][num]] for num, data_item in enumerate(list(data_list[0]))]
-        data_l += [[start * (data_item - eps * w_list[1][num]), start * (data_item + eps * w_list[1][num])] for num, data_item in enumerate(list(data_list[1]))]
+        data_l = [[data_item - eps * w_list[0][num], data_item + eps * w_list[0][num]] for num, data_item in
+                  enumerate(list(data_list[0]))]
+        data_l += [[start * (data_item - eps * w_list[1][num]), start * (data_item + eps * w_list[1][num])] for
+                   num, data_item in enumerate(list(data_list[1]))]
         jaccar_list.append((start, multi_jaccard_metric(data_l)))
         start += r_step
     plt.plot([R[0] for R in jaccar_list], [R[1] for R in jaccar_list], label='Jaccard metric by R')
@@ -171,16 +173,18 @@ def get_inner_r(data_list, w_list, R_out, need_save=True, save_path=''):
 def draw_all_intervals(data_list, w_list, optimal_m, need_save=True, save_path=''):
     data_len = (len(data_list[0]))
     x = np.arange(1, data_len + 1, 1, dtype=int)
-    eps = 10**(-4)
+    eps = 10 ** (-4)
     yerr = [eps] * data_len
     for i in range(data_len):
         yerr[i] *= w_list[0][i]
-    plt.errorbar(x, data_list[0], yerr=yerr, ecolor='cyan', label='intervals_ch_1')
+    plt.errorbar(x, data_list[0], yerr=yerr, ecolor='cyan', label='intervals_ch_1', elinewidth=0.8, capsize=4,
+                 capthick=1)
     yerr = [eps] * data_len
     for i in range(data_len):
         yerr[i] *= (w_list[1][i] * optimal_m)
         data_list[1][i] *= optimal_m
-    plt.errorbar(x, data_list[1], yerr=yerr, ecolor='red', label='intervals_ch_2')
+    plt.errorbar(x, data_list[1], yerr=yerr, ecolor='red', label='intervals_ch_2', elinewidth=0.8, capsize=4,
+                 capthick=1)
     plt.legend(frameon=False)
     plt.title(f'Intervals intersection')
     plt.xlabel("n")
@@ -211,21 +215,4 @@ def main(data_postfix_):
 
 if __name__ == "__main__":
     data_postfix = '800nm_0.23mm.csv'
-    # have_opt_list = []
-    # for filename in os.listdir('./data/ch_1'):
-    #     data_postfix = filename[8:]
-    #     print(data_postfix)
-    #     try:
-    #
-    #     except:
-    #         continue
-    #     print('_____________________________________________')
-    # print(have_opt_list)
-    #main(data_postfix)
-    data = read_data([f'./data/ch_1/Канал 1_{data_postfix}', f'./data/ch_2/Канал 2_{data_postfix}'])
-    x = np.arange(1, 201, 1, dtype=int).tolist()
-    for num, data_l in enumerate(data):
-        with open(f'data_{num}.mat', 'w') as file:
-            for num_, y_ in enumerate(data_l):
-                print(f'{x[num_]} {y_}')
-                file.write(f'{x[num_]} {y_}\n')
+    main(data_postfix)
