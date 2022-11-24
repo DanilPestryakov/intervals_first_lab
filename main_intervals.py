@@ -270,11 +270,16 @@ if __name__ == "__main__":
     #                     save_path=save_p + '/200')
     # draw_all_intervals_edge([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], 177, opt_m[0], True,
     #                         save_path=save_p + '/200')
-    from draw_data_status import get_residuals, add_point, draw_data_status_template
+    from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences
     intervals_residuals = get_residuals(interval_data, edge_points_, intervals_regression_params_3)
     fig_, ax_ = draw_data_status_template()
+    max_l = []
     for res_list in intervals_residuals:
+        m_l = max([res[1] for res in res_list])
+        max_l.append(m_l)
+    for num_, res_list in enumerate(intervals_residuals):
         fig_, ax_ = draw_data_status_template()
-        for interval in res_list:
-            add_point(interval, ax_)
+        infls = get_influences(res_list)
+        for infl in infls:
+            add_point(infl, ax_)
         fig_.show()

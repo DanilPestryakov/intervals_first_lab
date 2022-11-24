@@ -62,6 +62,7 @@ def get_influences(interval_list):
         l = inter_rad / get_rad(interval)
         r = (get_mid(interval) - inter_mid) / get_rad(interval)
         influences.append([l, r])
+    return influences
 
 
 def get_residuals(interval_d, edge_points, drift_params_3):
