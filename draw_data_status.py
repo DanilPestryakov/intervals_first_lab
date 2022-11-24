@@ -31,8 +31,13 @@ def draw_data_status_template(x_lims=(0, 2), title='Influences'):
     ax.set_xlabel('l(x, y)')
     ax.set_ylabel('r(x, y)')
     ax.set_title(title)
-    return fig
+    return fig, ax
 
 
-fig_ = draw_data_status_template()
+def add_point(point, ax):
+    ax.plot(point[0], point[1], 'bo')
+
+
+fig_, ax_ = draw_data_status_template()
+add_point((0.1, 0.1), ax_)
 fig_.show()
