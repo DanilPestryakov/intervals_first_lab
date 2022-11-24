@@ -83,8 +83,3 @@ def get_residuals(interval_d, edge_points, drift_params_3):
                                    interval[1] - (num_ + 1) * drift_param[0][0] - drift_param[1][0]])
         new_list.append(new_list__)
     return new_list
-
-
-fig_, ax_ = draw_data_status_template()
-add_point((0.1, 0.1), ax_)
-fig_.show()
