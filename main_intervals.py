@@ -233,7 +233,7 @@ if __name__ == "__main__":
     #intervals_w_o_drift = dif_drift_component(interval_data, intervals_regression_drift_params)
 
     #opt_m = get_inner_r(intervals_w_o_drift, [0.9377, 0.9385], True, save_path=save_p)
-   # draw_all_intervals(intervals_w_o_drift, opt_m[0], True, save_path=save_p)
+    #draw_all_intervals(intervals_w_o_drift, opt_m[0], True, save_path=save_p)
     #draw_interval_with_edge(interval_data, [[43, 178], [41, 190]], True, save_path=save_p)
     edge_points_ = [[43, 178], [41, 190]]
     intervals_regression_params_3 = [[([8.3824e-07, 1.0232e-05], [4.7195e-01, 4.7214e-01]),
@@ -242,26 +242,27 @@ if __name__ == "__main__":
                                      [([2.4444e-06, 1.1782e-05], [5.0295e-01, 5.0313e-01]),
                                       ([3.8147e-06, 6.2514e-06], [5.0300e-01, 5.0329e-01]),
                                       ([0.0, 3.7425e-05], [4.9690e-01, 5.0420e-01])]]
-    intervals_reg_w_o_drift = dif_drift_component_edge(interval_data, edge_points_, intervals_regression_params_3)
+    #intervals_reg_w_o_drift = dif_drift_component_edge(interval_data, edge_points_, intervals_regression_params_3)
     #draw_interval_regression_edge(interval_data, edge_points_, intervals_regression_params_3, True, save_path=save_p)
-    out_coeff = get_out_coeff([interval_data[0][:41], interval_data[1][:41]])
-    R_outer = [min(out_coeff), max(out_coeff)]
-    print(R_outer)
-    opt_m = get_inner_r([intervals_reg_w_o_drift[0][:41], intervals_reg_w_o_drift[1][:41]], R_outer, True,
-                        save_path=save_p+'/40')
-    draw_all_intervals_edge([intervals_reg_w_o_drift[0][:41], intervals_reg_w_o_drift[1][:41]], 0, opt_m[0], True,
-                            save_path=save_p+'/40')
-    out_coeff = get_out_coeff([interval_data[0][41:177], interval_data[1][41:177]])
-    R_outer = [min(out_coeff), max(out_coeff)]
-    print(R_outer)
-    opt_m = get_inner_r([intervals_reg_w_o_drift[0][41:177], intervals_reg_w_o_drift[1][41:177]], R_outer, True,
-                        save_path=save_p + '/177')
-    draw_all_intervals_edge([intervals_reg_w_o_drift[0][41:177], intervals_reg_w_o_drift[1][41:177]], 41, opt_m[0], True,
-                            save_path=save_p + '/177')
-    out_coeff = get_out_coeff([interval_data[0][177:], interval_data[1][177:]])
-    R_outer = [min(out_coeff), max(out_coeff)]
-    print(R_outer)
-    opt_m = get_inner_r([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], R_outer, True,
-                        save_path=save_p + '/200')
-    draw_all_intervals_edge([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], 177, opt_m[0], True,
-                            save_path=save_p + '/200')
+    #out_coeff = get_out_coeff([interval_data[0][:41], interval_data[1][:41]])
+    #R_outer = [min(out_coeff), max(out_coeff)]
+    #print(R_outer)
+    #opt_m = get_inner_r([intervals_reg_w_o_drift[0][:41], intervals_reg_w_o_drift[1][:41]], R_outer, True,
+    #                    save_path=save_p+'/40')
+    # draw_all_intervals_edge([intervals_reg_w_o_drift[0][:41], intervals_reg_w_o_drift[1][:41]], 0, opt_m[0], True,
+    #                         save_path=save_p+'/40')
+    # out_coeff = get_out_coeff([interval_data[0][41:177], interval_data[1][41:177]])
+    # R_outer = [min(out_coeff), max(out_coeff)]
+    # print(R_outer)
+    # opt_m = get_inner_r([intervals_reg_w_o_drift[0][41:177], intervals_reg_w_o_drift[1][41:177]], R_outer, True,
+    #                     save_path=save_p + '/177')
+    # draw_all_intervals_edge([intervals_reg_w_o_drift[0][41:177], intervals_reg_w_o_drift[1][41:177]], 41, opt_m[0], True,
+    #                         save_path=save_p + '/177')
+    # out_coeff = get_out_coeff([interval_data[0][177:], interval_data[1][177:]])
+    # R_outer = [min(out_coeff), max(out_coeff)]
+    # print(R_outer)
+    # opt_m = get_inner_r([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], R_outer, True,
+    #                     save_path=save_p + '/200')
+    # draw_all_intervals_edge([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], 177, opt_m[0], True,
+    #                         save_path=save_p + '/200')
+

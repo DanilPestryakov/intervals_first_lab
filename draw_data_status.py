@@ -2,6 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def get_rad(interval):
+    return (max(interval) - min(interval)) / 2
+
+
+def get_mid(interval):
+    return (interval[0] + interval[1]) / 2
+
+
 def draw_data_status_template(x_lims=(0, 2), title='Influences'):
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -43,6 +51,38 @@ def get_intersections(interval_list):
     for i in range(1, len(interval_list), 1):
         res = [max(min(res), min(interval_list[i])), min(max(res), max(interval_list[i]))]
     return res
+
+
+def get_influences(interval_list):
+    intersection = get_intersections(interval_list)
+    inter_rad = get_rad(intersection)
+    inter_mid = get_mid(intersection)
+    influences = []
+    for interval in interval_list:
+        l = inter_rad / get_rad(interval)
+        r = (get_mid(interval) - inter_mid) / get_rad(interval)
+        influences.append([l, r])
+
+
+def get_residuals(interval_d, edge_points, drift_params_3):
+    new_list = []
+    for list_num, list_ in enumerate(interval_d):
+        new_list__ = []
+        for num, drift_param in enumerate(drift_params_3[list_num]):
+            if num == 0:
+                new_list_ = list_[:edge_points[list_num][0]]
+                start = 0
+            elif num == 1:
+                new_list_ = list_[edge_points[list_num][0]:edge_points[list_num][1]]
+                start = edge_points[list_num][0]
+            else:
+                new_list_ = list_[edge_points[list_num][1]:]
+                start = edge_points[list_num][1]
+            for num_, interval in enumerate(new_list_, start=start):
+                new_list__.append([interval[0] - (num_ + 1) * drift_param[0][1] - drift_param[1][1],
+                                   interval[1] - (num_ + 1) * drift_param[0][0] - drift_param[1][0]])
+        new_list.append(new_list__)
+    return new_list
 
 
 fig_, ax_ = draw_data_status_template()
