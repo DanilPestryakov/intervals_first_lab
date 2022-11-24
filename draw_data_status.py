@@ -38,6 +38,13 @@ def add_point(point, ax):
     ax.plot(point[0], point[1], 'bo')
 
 
+def get_intersections(interval_list):
+    res = interval_list[0]
+    for i in range(1, len(interval_list), 1):
+        res = [max(min(res), min(interval_list[i])), min(max(res), max(interval_list[i]))]
+    return res
+
+
 fig_, ax_ = draw_data_status_template()
 add_point((0.1, 0.1), ax_)
 fig_.show()
