@@ -62,7 +62,7 @@ def get_influences(interval_list):
         l = inter_rad / get_rad(interval)
         r = (get_mid(interval) - inter_mid) / get_rad(interval)
         influences.append([l, r])
-    return influences
+    return influences, intersection
 
 
 def get_residuals(interval_d, edge_points, drift_params_3):
@@ -80,6 +80,18 @@ def get_residuals(interval_d, edge_points, drift_params_3):
                 new_list_ = list_[edge_points[list_num][1]:]
                 start = edge_points[list_num][1]
             for num_, interval in enumerate(new_list_, start=start):
+                new_list__.append([interval[0] - (num_ + 1) * drift_param[0][1] - drift_param[1][1],
+                                   interval[1] - (num_ + 1) * drift_param[0][0] - drift_param[1][0]])
+        new_list.append(new_list__)
+    return new_list
+
+
+def get_residuals_1(interval_d, drift_params):
+    new_list = []
+    for list_num, list_ in enumerate(interval_d):
+        new_list__ = []
+        for num, drift_param in enumerate(drift_params[list_num]):
+            for num_, interval in enumerate(list_, start=0):
                 new_list__.append([interval[0] - (num_ + 1) * drift_param[0][1] - drift_param[1][1],
                                    interval[1] - (num_ + 1) * drift_param[0][0] - drift_param[1][0]])
         new_list.append(new_list__)

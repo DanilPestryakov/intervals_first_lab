@@ -226,6 +226,28 @@ def get_out_coeff(data_list):
     return out_coeff_l
 
 
+def draw_residuals(residuals_l, intersection_, save_path=None):
+    from draw_data_status import get_rad, get_mid
+    data_len = (len(residuals_l))
+    x = np.arange(1, data_len + 1, 1, dtype=int)
+    y_err = [get_rad(interval) for interval in residuals_l]
+    y = [get_mid(interval) for interval in residuals_l]
+    plt.errorbar(x, y, yerr=y_err, ecolor='cyan', label=f'intervals_ch_1', elinewidth=0.8, capsize=4,
+                 capthick=1)
+    x1, y1 = [1, 200], [intersection_[0], intersection_[0]]
+    x2, y2 = [1, 200], [intersection_[1], intersection_[1]]
+    plt.plot(x1, y1, 'r--')
+    plt.plot(x2, y2, 'r--')
+    plt.legend(frameon=False)
+    plt.title(f'Chanel interval regression with 3 section')
+    plt.xlabel("n")
+    plt.ylabel("mV")
+    if save_path is not None:
+        plt.savefig(f'{save_path}/regression_intervals_with_3_section_ch_1.png')
+    plt.show()
+
+
+
 if __name__ == "__main__":
     data_postfix = '800nm_0.23mm.csv'
     interval_data = read_data_with_intervals(
@@ -270,16 +292,16 @@ if __name__ == "__main__":
     #                     save_path=save_p + '/200')
     # draw_all_intervals_edge([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], 177, opt_m[0], True,
     #                         save_path=save_p + '/200')
-    from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences
+    from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences, get_residuals_1
     intervals_residuals = get_residuals(interval_data, edge_points_, intervals_regression_params_3)
-    fig_, ax_ = draw_data_status_template()
-    max_l = []
-    for res_list in intervals_residuals:
-        m_l = max([res[1] for res in res_list])
-        max_l.append(m_l)
-    for num_, res_list in enumerate(intervals_residuals):
-        fig_, ax_ = draw_data_status_template()
-        infls = get_influences(res_list)
+    intervals_residuals_1 = get_residuals_1(interval_data, [[([3.4551e-06, 4.2070e-06], [4.7202e-01, 4.7214e-01])],
+                                                            [([5.1628e-06, 6.2094e-06], [5.0301e-01, 5.0312e-01])]])
+
+    for num_, res_list in enumerate(intervals_residuals_1):
+        infls, intersection = get_influences(res_list)
+        draw_residuals(res_list, intersection)
+        m_l = max([res[0] for res in infls])
+        fig_, ax_ = draw_data_status_template([0, max(m_l, 2)])
         for infl in infls:
             add_point(infl, ax_)
         fig_.show()
