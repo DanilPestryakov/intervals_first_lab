@@ -53,8 +53,18 @@ def get_intersections(interval_list):
     return res
 
 
-def get_influences(interval_list):
-    intersection = get_intersections(interval_list)
+def get_intersections_wrong_int(interval_list):
+    res = interval_list[0]
+    for i in range(1, len(interval_list), 1):
+        res = [max(res[0], interval_list[i][0]), min(res[1], interval_list[i][1])]
+    return res
+
+
+def get_influences(interval_list, intersection_=None):
+    if intersection_ is not None:
+        intersection = intersection_
+    else:
+        intersection = get_intersections(interval_list)
     inter_rad = get_rad(intersection)
     inter_mid = get_mid(intersection)
     influences = []

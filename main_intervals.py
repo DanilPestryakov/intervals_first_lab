@@ -263,12 +263,12 @@ if __name__ == "__main__":
     # draw_all_intervals(intervals_w_o_drift, opt_m[0], True, save_path=save_p)
     # draw_interval_with_edge(interval_data, [[43, 178], [41, 190]], True, save_path=save_p)
     edge_points_ = [[43, 178], [41, 190]]
-    intervals_regression_params_3 = [[([8.3824e-07, 1.0232e-05], [4.7195e-01, 4.7214e-01]),
-                                      ([1.2508e-06, 4.1690e-06], [4.7202e-01, 4.7235e-01]),
-                                      ([2.6455e-06, 1.8289e-05], [4.6932e-01, 4.7230e-01])],
-                                     [([2.4444e-06, 1.1782e-05], [5.0295e-01, 5.0313e-01]),
-                                      ([3.8147e-06, 6.2514e-06], [5.0300e-01, 5.0329e-01]),
-                                      ([0.0, 3.7425e-05], [4.9690e-01, 5.0420e-01])]]
+    intervals_regression_params_3 = [[([0, 1.2058e-05], [0.4720, 0.4721]),
+                                      ([1.6296e-06, 4.2911e-06], [4.7202e-01, 4.7227e-01]),
+                                      ([3.5000e-06, 1.0823e-05], [4.7078e-01, 4.7213e-01])],
+                                     [([2.7222e-06, 1.1479e-05], [5.0296e-01, 5.0313e-01]),
+                                      ([3.9064e-06, 6.1838e-06], [5.0301e-01, 5.0328e-01]),
+                                      ([0.0, 3.6175e-05], [0.4971, 0.5042])]]
     # intervals_reg_w_o_drift = dif_drift_component_edge(interval_data, edge_points_, intervals_regression_params_3)
     # draw_interval_regression_edge(interval_data, edge_points_, intervals_regression_params_3, True, save_path=save_p)
     # out_coeff = get_out_coeff([interval_data[0][:41], interval_data[1][:41]])
@@ -292,16 +292,30 @@ if __name__ == "__main__":
     #                     save_path=save_p + '/200')
     # draw_all_intervals_edge([intervals_reg_w_o_drift[0][177:], intervals_reg_w_o_drift[1][177:]], 177, opt_m[0], True,
     #                         save_path=save_p + '/200')
-    from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences, get_residuals_1
+    from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences, get_residuals_1, \
+        get_intersections_wrong_int, get_intersections
     intervals_residuals = get_residuals(interval_data, edge_points_, intervals_regression_params_3)
-    intervals_residuals_1 = get_residuals_1(interval_data, [[([3.4551e-06, 4.2070e-06], [4.7202e-01, 4.7214e-01])],
-                                                            [([5.1628e-06, 6.2094e-06], [5.0301e-01, 5.0312e-01])]])
+    intervals_residuals_1 = get_residuals_1(interval_data, [[intervals_regression_params_3[0][1]],
+                                                            [intervals_regression_params_3[1][1]]])
 
     for num_, res_list in enumerate(intervals_residuals_1):
-        infls, intersection = get_influences(res_list)
+        inters = get_intersections(intervals_residuals_1[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+        infls, intersection = get_influences(res_list, inters)
         draw_residuals(res_list, intersection)
         m_l = max([res[0] for res in infls])
         fig_, ax_ = draw_data_status_template([0, max(m_l, 2)])
         for infl in infls:
             add_point(infl, ax_)
         fig_.show()
+
+    # for num_, res_list in enumerate(intervals_residuals):
+    #     inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     print(inter_w)
+    #     inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     infls, intersection = get_influences(res_list, inters)
+    #     draw_residuals(res_list, intersection)
+    #     m_l = max([res[0] for res in infls])
+    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)])
+    #     for infl in infls:
+    #         add_point(infl, ax_)
+    #     fig_.show()
