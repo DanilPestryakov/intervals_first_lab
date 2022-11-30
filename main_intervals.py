@@ -226,26 +226,65 @@ def get_out_coeff(data_list):
     return out_coeff_l
 
 
-def draw_residuals(residuals_l, intersection_, save_path=None):
+def draw_residuals(residuals_l, intersection_, title='', save_path=None):
     from draw_data_status import get_rad, get_mid
     data_len = (len(residuals_l))
     x = np.arange(1, data_len + 1, 1, dtype=int)
     y_err = [get_rad(interval) for interval in residuals_l]
     y = [get_mid(interval) for interval in residuals_l]
-    plt.errorbar(x, y, yerr=y_err, ecolor='cyan', label=f'intervals_ch_1', elinewidth=0.8, capsize=4,
+    plt.errorbar(x, y, yerr=y_err, ecolor='cyan', label=f'residuals', elinewidth=0.8, capsize=4,
                  capthick=1)
     x1, y1 = [1, 200], [intersection_[0], intersection_[0]]
     x2, y2 = [1, 200], [intersection_[1], intersection_[1]]
-    plt.plot(x1, y1, 'r--')
+    x3, y3 = [1, 200], [(intersection_[1] + intersection_[0]) / 2, (intersection_[1] + intersection_[0]) / 2]
+    plt.plot(x1, y1, 'r--', label=f'[{y1[0]:.2e}, {y2[1]:.2e}]')
     plt.plot(x2, y2, 'r--')
+    plt.plot(x3, y3, 'k--', label=f'mid={y3[0]:.2e}')
     plt.legend(frameon=False)
-    plt.title(f'Chanel interval regression with 3 section')
+    plt.title(title)
+    plt.yticks(fontsize=5)
     plt.xlabel("n")
-    plt.ylabel("mV")
+    plt.ylabel("residual")
     if save_path is not None:
         plt.savefig(f'{save_path}/regression_intervals_with_3_section_ch_1.png')
     plt.show()
 
+
+def regularization(residuals, edge_point, intersection_, need_visualize=False, title='', label=''):
+    w_list = [1] * len(residuals)
+    left_intervals = residuals[:edge_point].copy()
+    for num, interval in enumerate(left_intervals):
+        mid = (left_intervals[num][1] + left_intervals[num][0]) / 2
+        if interval[0] > intersection_[0]:
+            left_intervals[num][0] = intersection_[0]
+            left_intervals[num][1] = mid + (mid - intersection_[0])
+            w_list[num] = (mid - intersection_[0]) / ((interval[1] - interval[0]) / 2)
+        if interval[1] < intersection_[1]:
+            left_intervals[num][1] = intersection_[1]
+            left_intervals[num][0] = mid - (intersection_[1] - mid)
+            w_list[num] = (intersection_[1] - mid) / ((interval[1] - interval[0]) / 2)
+    if need_visualize:
+        plt.hist(w_list, label=label)
+        plt.xlabel(label)
+        plt.legend(frameon=False)
+        plt.title(title)
+        plt.show()
+    return left_intervals + residuals[edge_point:]
+
+
+def draw_params(params_1, params_2=None, title='', param_name='', param_name_2=''):
+    x = np.arange(1, len(params_1) + 1, 1, dtype=int)
+    fig, ax = plt.subplots()
+    if params_2:
+        ax.plot(x, np.fabs(np.array(params_1)), label=param_name)
+        ax.plot(x, 1 - np.array(params_2), label=param_name_2)
+    else:
+        ax.plot(x, params_1, label=param_name)
+    plt.xlabel("n")
+    plt.ylabel(param_name)
+    ax.legend()
+    ax.set_title(title)
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -294,28 +333,64 @@ if __name__ == "__main__":
     #                         save_path=save_p + '/200')
     from draw_data_status import get_residuals, add_point, draw_data_status_template, get_influences, get_residuals_1, \
         get_intersections_wrong_int, get_intersections
+
     intervals_residuals = get_residuals(interval_data, edge_points_, intervals_regression_params_3)
     intervals_residuals_1 = get_residuals_1(interval_data, [[intervals_regression_params_3[0][1]],
                                                             [intervals_regression_params_3[1][1]]])
 
-    for num_, res_list in enumerate(intervals_residuals_1):
-        inters = get_intersections(intervals_residuals_1[num_][edge_points_[num_][0]:edge_points_[num_][1]])
-        infls, intersection = get_influences(res_list, inters)
-        draw_residuals(res_list, intersection)
-        m_l = max([res[0] for res in infls])
-        fig_, ax_ = draw_data_status_template([0, max(m_l, 2)])
-        for infl in infls:
-            add_point(infl, ax_)
-        fig_.show()
-
+    # for num_, res_list in enumerate(intervals_residuals_1):
+    #     inters = get_intersections(intervals_residuals_1[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     infls, intersection = get_influences(res_list, inters)
+    #     draw_residuals(res_list, intersection, title=f'Residuals with central regression, ch_{num_ + 1}')
+    #     m_l = max([res[0] for res in infls])
+    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with central regression, ch_{num_ + 1}')
+    #     for infl in infls:
+    #         add_point(infl, ax_)
+    #     fig_.show()
+    #
     # for num_, res_list in enumerate(intervals_residuals):
     #     inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
     #     print(inter_w)
     #     inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
     #     infls, intersection = get_influences(res_list, inters)
-    #     draw_residuals(res_list, intersection)
+    #     draw_residuals(res_list, intersection, title=f'Residuals with central regression, ch_{num_ + 1}')
     #     m_l = max([res[0] for res in infls])
-    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)])
+    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with central regression, ch_{num_ + 1}')
     #     for infl in infls:
     #         add_point(infl, ax_)
     #     fig_.show()
+
+    # intervals_regression_params_3_1 = intervals_regression_params_3.copy()
+    # intervals_regression_params_3_1[0][2] = intervals_regression_params_3_1[0][1]
+    # intervals_regression_params_3_1[1][2] = intervals_regression_params_3_1[1][1]
+
+    intervals_residuals = get_residuals_1(interval_data, [[intervals_regression_params_3[0][1]],
+                                                            [intervals_regression_params_3[1][1]]])
+    # for num_, res_list in enumerate(intervals_residuals):
+    #     inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     print(inter_w)
+    #     inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     infls, intersection = get_influences(res_list, inters)
+    #     draw_residuals(res_list, intersection, title=f'Residuals with all regressions, ch_{num_}')
+    #     m_l = max([res[0] for res in infls])
+    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with all regressions, ch_{num_}')
+    #     for infl in infls:
+    #         add_point(infl, ax_)
+    #     fig_.show()
+
+    for num_, res_list in enumerate(intervals_residuals):
+        inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+        print(inter_w)
+        inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+        new_res_list = regularization(res_list, edge_points_[num_][0], inters, True,
+                                      f'Weight of regularization, ch_{num_ + 1}', f'w_ch_{num_ + 1}')
+        infls, intersection = get_influences(new_res_list, inters)
+        draw_residuals(new_res_list, intersection, title=f'Residuals with central regressions, ch_{num_ + 1}')
+        m_l = max([res[0] for res in infls])
+        draw_params([infl[0] for infl in infls], title=f'High leverage, ch_{num_ + 1}', param_name='l')
+        draw_params([infl[1] for infl in infls], title=f'Relative residual, ch_{num_ + 1}', param_name='|r|',
+                    params_2=[infl[0] for infl in infls], param_name_2='1-l')
+        fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with all regressions, ch_{num_ + 1}')
+        for infl in infls:
+            add_point(infl, ax_)
+        fig_.show()
