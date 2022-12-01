@@ -287,6 +287,29 @@ def draw_params(params_1, params_2=None, title='', param_name='', param_name_2='
     plt.show()
 
 
+def get_matlab_form(intervals):
+    res_str = '['
+    for interval in intervals:
+        res_str = f'{res_str}[{interval[0]}, {interval[1]}];'
+    print(f'{res_str[:-1]}]')
+
+
+def draw_mode(mode_data, title='Mode'):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    data_len = len(mode_data)
+    for num, mode_data_inst in enumerate(mode_data):
+        x1, y1 = [mode_data_inst[0][0], mode_data_inst[0][1]], [mode_data_inst[1], mode_data_inst[1]]
+        ax.plot(x1, y1, 'r')
+        if num < data_len - 1:
+            x2, y2 = [mode_data_inst[0][1], mode_data_inst[0][1]], [mode_data_inst[1], mode_data[num + 1][1]]
+            ax.plot(x2, y2, 'r')
+    ax.set_xlabel('ticks')
+    ax.set_ylabel('frequency')
+    ax.set_title(title)
+    plt.show()
+
+
 if __name__ == "__main__":
     data_postfix = '800nm_0.23mm.csv'
     interval_data = read_data_with_intervals(
@@ -378,19 +401,21 @@ if __name__ == "__main__":
     #         add_point(infl, ax_)
     #     fig_.show()
 
-    for num_, res_list in enumerate(intervals_residuals):
-        inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
-        print(inter_w)
-        inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
-        new_res_list = regularization(res_list, edge_points_[num_][0], inters, True,
-                                      f'Weight of regularization, ch_{num_ + 1}', f'w_ch_{num_ + 1}')
-        infls, intersection = get_influences(new_res_list, inters)
-        draw_residuals(new_res_list, intersection, title=f'Residuals with central regressions, ch_{num_ + 1}')
-        m_l = max([res[0] for res in infls])
-        draw_params([infl[0] for infl in infls], title=f'High leverage, ch_{num_ + 1}', param_name='l')
-        draw_params([infl[1] for infl in infls], title=f'Relative residual, ch_{num_ + 1}', param_name='|r|',
-                    params_2=[infl[0] for infl in infls], param_name_2='1-l')
-        fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with all regressions, ch_{num_ + 1}')
-        for infl in infls:
-            add_point(infl, ax_)
-        fig_.show()
+    # for num_, res_list in enumerate(intervals_residuals):
+    #     inter_w = get_intersections_wrong_int(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     print(inter_w)
+    #     inters = get_intersections(intervals_residuals[num_][edge_points_[num_][0]:edge_points_[num_][1]])
+    #     new_res_list = regularization(res_list, edge_points_[num_][0], inters, True,
+    #                                   f'Weight of regularization, ch_{num_ + 1}', f'w_ch_{num_ + 1}')
+    #     infls, intersection = get_influences(new_res_list, inters)
+    #     draw_residuals(new_res_list, intersection, title=f'Residuals with central regression, ch_{num_ + 1}')
+    #     m_l = max([res[0] for res in infls])
+    #     draw_params([infl[0] for infl in infls], title=f'High leverage, ch_{num_ + 1}', param_name='l')
+    #     draw_params([infl[1] for infl in infls], title=f'Relative residual, ch_{num_ + 1}', param_name='|r|',
+    #                 params_2=[infl[0] for infl in infls], param_name_2='1-l')
+    #     fig_, ax_ = draw_data_status_template([0, max(m_l, 2)], title=f'Influences with central regression, ch_{num_ + 1}')
+    #     for infl in infls:
+    #         add_point(infl, ax_)
+    #     fig_.show()
+
+    draw_mode([([1, 1.5], 1), ([1.5, 2], 2), ([2, 3], 1)])
